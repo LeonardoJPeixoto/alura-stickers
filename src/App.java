@@ -1,22 +1,23 @@
 import util.JsonParser;
 
+import java.io.IOError;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class App {
-
-//    private static final String URL_API = "https://imdb-api.com/en/API/Top250Movies/CHAVE_API_IMDB";
-        private static final String URL_API = "https://mocki.io/v1/9a7c1ca9-29b4-4eb3-8306-1adb9d159060";
 
     public static void main(String[] args) throws Exception {
         System.out.println("Hello, World!");
 
         // fazer uma conexão HTTP
-        var endereco = URI.create(URL_API);
+        var endereco = URI.create(leUrlDeProperties());
         var client = HttpClient.newHttpClient();
         var request = HttpRequest.newBuilder(endereco).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -38,7 +39,7 @@ public class App {
                 });
 
         // Desafios
-        // TODO: Extrair chave do IMDB
+        // Extrair chave do IMDB - OK
         // TODO: Trocar endpoint para MostPopularMovies
         // TODO: Saída visualmente melhorada no terminal
         // TODO: Usar Jackson/Gson — continuar como List de Map ?
@@ -46,4 +47,37 @@ public class App {
 
     }
 
+    private static String leUrlDeProperties() {
+        try (InputStream input = App.class.getResourceAsStream("resources/config.properties")) {
+            if (input == null) {
+                throw new RuntimeException("Arquivo de config.properties não encontrado.");
+            }
+
+            Properties prop = new Properties();
+            prop.load(input);
+
+            String url = prop.getProperty("IMDB_URL");
+            String chave = prop.getProperty("IMDB_CHAVE_API");
+
+            if (stringVazia(url) || stringVazia(chave)) {
+                throw new RuntimeException("Url e/ou chave do IMDB não configurados corretamente em config.properties.");
+            }
+
+            if (url.contains("mock")) {
+                System.out.println("AVISO: usando URL mockada.");
+            }
+
+            return url + chave;
+        } catch (IOError | IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    private static boolean stringVazia(String s) {
+        if (s == null) {
+            return true;
+        }
+        return "".equals(s.trim());
+    }
 }
