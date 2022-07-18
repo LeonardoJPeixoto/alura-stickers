@@ -40,7 +40,7 @@ public class App {
 
         // Desafios
         // Extrair chave do IMDB - OK
-        // TODO: Trocar endpoint para MostPopularMovies
+        // Trocar endpoint para MostPopularMovies - OK
         // TODO: Saída visualmente melhorada no terminal
         // TODO: Usar Jackson/Gson — continuar como List de Map ?
         // TODO: Método para usuário dar avaliação no filme
