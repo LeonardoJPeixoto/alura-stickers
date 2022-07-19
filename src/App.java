@@ -13,8 +13,15 @@ import java.util.Properties;
 
 public class App {
 
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BOLD = "\u001B[1m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLACK  = "\u001B[30m";
+    public static final String ANSI_BRIGHT_BG_CYAN   = "\u001B[105m";
+
     public static void main(String[] args) throws Exception {
-        System.out.println("Hello, World!");
+
+        System.out.println(ANSI_BOLD + "Hello" + ANSI_RESET + ", World!");
 
         // fazer uma conexão HTTP
         var endereco = URI.create(leUrlDeProperties());
@@ -31,20 +38,33 @@ public class App {
 
         // exibir e manipular os dados
         listaDeFilmes.stream()
-                .limit(50)
+                .limit(250)
                 .forEach(mapaFilme -> {
-                    System.out.printf("Título: %s %n", mapaFilme.get("title"));
-                    System.out.printf("Poster: %s %n", mapaFilme.get("image"));
-                    System.out.printf("Avaliação: %s %n", mapaFilme.get("imDbRating"));
+                    System.out.println();
+                    System.out.printf(ANSI_BOLD + ANSI_YELLOW + "Título" + ANSI_RESET + ": " + ANSI_BLACK + ANSI_BRIGHT_BG_CYAN + " %s " + ANSI_RESET + "%n", mapaFilme.get("title"));
+                    System.out.printf(ANSI_BOLD + ANSI_YELLOW + "Poster" + ANSI_RESET + ": %s %n", mapaFilme.get("image"));
+                    String avaliacao = mapaFilme.get("imDbRating");
+                    String estrelas = converteEmEstrelas(avaliacao);
+                    System.out.printf(ANSI_BOLD + ANSI_YELLOW + "Avaliação" + ANSI_RESET + ": " + ANSI_YELLOW +  "%s" + ANSI_RESET + " (%s)\n", estrelas, avaliacao != null ? avaliacao : "Null");
+                    System.out.println();
                 });
 
         // Desafios
         // Extrair chave do IMDB - OK
         // Trocar endpoint para MostPopularMovies - OK
-        // TODO: Saída visualmente melhorada no terminal
+        // Saída visualmente melhorada no terminal - OK
         // TODO: Usar Jackson/Gson — continuar como List de Map ?
         // TODO: Método para usuário dar avaliação no filme
 
+    }
+
+    private static String converteEmEstrelas(String imDbRating) {
+        if (stringVazia(imDbRating)) {
+            return "NA";
+        }
+        double avaliacao = Double.parseDouble(imDbRating);
+        int numeroDeEstrelas = (int) Math.round(avaliacao/2);
+        return "\u2B50".repeat(numeroDeEstrelas);
     }
 
     private static String leUrlDeProperties() {
