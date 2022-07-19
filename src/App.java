@@ -1,4 +1,5 @@
-import util.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOError;
 import java.io.IOException;
@@ -7,8 +8,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 public class App {
@@ -33,7 +34,10 @@ public class App {
         System.out.println(body);
 
         // extrair só os dados que interessam (título, poster, classificação)
-        List<Map<String, String>> listaDeFilmes = new JsonParser().parse(body);
+//        List<Map<String, String>> listaDeFilmes = new JsonParser().parse(body);
+        TypeReference<Resposta> typeRef = new TypeReference<>() {};
+        Resposta resposta = new ObjectMapper().readValue(body, typeRef);
+        List<HashMap<String, String>> listaDeFilmes = resposta.items;
         System.out.printf("Número de Filmes encontrados: %s%n", listaDeFilmes.size());
 
         // exibir e manipular os dados
@@ -53,7 +57,7 @@ public class App {
         // Extrair chave do IMDB - OK
         // Trocar endpoint para MostPopularMovies - OK
         // Saída visualmente melhorada no terminal - OK
-        // TODO: Usar Jackson/Gson — continuar como List de Map ?
+        // Usar Jackson/Gson — continuar como List de Map - OK
         // TODO: Método para usuário dar avaliação no filme
 
     }
@@ -99,5 +103,26 @@ public class App {
             return true;
         }
         return "".equals(s.trim());
+    }
+
+    private static class Resposta {
+        private List<HashMap<String, String>> items;
+        private String errorMessage;
+
+        public List<HashMap<String, String>> getItems() {
+            return items;
+        }
+
+        public void setItems(List<HashMap<String, String>> items) {
+            this.items = items;
+        }
+
+        public String getErrorMessage() {
+            return errorMessage;
+        }
+
+        public void setErrorMessage(String errorMessage) {
+            this.errorMessage = errorMessage;
+        }
     }
 }
