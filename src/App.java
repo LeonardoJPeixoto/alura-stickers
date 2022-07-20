@@ -56,12 +56,25 @@ public class App {
                     }
                 });
 
-        // Desafios
+        // Desafios Aula 1
         // Extrair chave do IMDB - OK
         // Trocar endpoint para MostPopularMovies - OK
         // Saída visualmente melhorada no terminal - OK
         // Usar Jackson/Gson — continuar como List de Map - OK
         // TODO: Método para usuário dar avaliação no filme
+
+        // Desafios Aula 2
+        // TODO: usar imagem do Poster
+        // TODO: centralizar texto
+        // TODO: colocar texto customizado pela avaliação
+        // TODO: colocar foto com joinha
+        // TODO: fazer outline da imagem
+        // TODO: aplicar filtros diversos (contorno do personagem?)
+
+        // Aula 3
+        // TODO: usar record
+        // TODO: usar exceção customizada
+        // TODO: usar outras fontes (Marvel?)
 
     }
 
