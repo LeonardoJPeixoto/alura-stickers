@@ -1,14 +1,7 @@
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.HashMap;
+import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 
@@ -17,40 +10,50 @@ public class App {
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BOLD = "\u001B[1m";
     public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_BLACK  = "\u001B[30m";
-    public static final String ANSI_BRIGHT_BG_CYAN   = "\u001B[105m";
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_BRIGHT_BG_CYAN = "\u001B[105m";
 
     public static void main(String[] args) throws Exception {
 
-        System.out.println(ANSI_BOLD + "Hello" + ANSI_RESET + ", World!");
+        ClienteHttp clienteHttp = new ClienteHttp();
 
-        // fazer uma conexão HTTP
-        var endereco = URI.create(leUrlDeProperties());
-        var client = HttpClient.newHttpClient();
-        var request = HttpRequest.newBuilder(endereco).build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        String body = response.body();
-        System.out.println("Body: ");
-        System.out.println(body);
+        // Lista de filmes Imdb
+//        String url = leUrlDeProperties();
+//        Extrator extrator = new ExtratorImdb();
 
-        // extrair só os dados que interessam (título, poster, classificação)
-//        List<Map<String, String>> listaDeFilmes = new JsonParser().parse(body);
-        TypeReference<Resposta> typeRef = new TypeReference<>() {};
-        Resposta resposta = new ObjectMapper().readValue(body, typeRef);
-        List<HashMap<String, String>> listaDeFilmes = resposta.items;
-        System.out.printf("Número de Filmes encontrados: %s%n", listaDeFilmes.size());
+        // Lista de imagens da Nasa
+        String url = "https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&count=5";
+        Extrator extrator = new ExtratorNasa();
+
+        String json = clienteHttp.buscaDados(url);
+
+        List<Conteudo> listaDeConteudos = extrator.extrai(json);
+        System.out.printf("Número de Itens encontrados: %s%n", listaDeConteudos.size());
 
         // exibir e manipular os dados
-        listaDeFilmes.stream()
-                .limit(250)
-                .forEach(mapaFilme -> {
-                    System.out.println();
-                    System.out.printf(ANSI_BOLD + ANSI_YELLOW + "Título" + ANSI_RESET + ": " + ANSI_BLACK + ANSI_BRIGHT_BG_CYAN + " %s " + ANSI_RESET + "%n", mapaFilme.get("title"));
-                    System.out.printf(ANSI_BOLD + ANSI_YELLOW + "Poster" + ANSI_RESET + ": %s %n", mapaFilme.get("image"));
-                    String avaliacao = mapaFilme.get("imDbRating");
-                    String estrelas = converteEmEstrelas(avaliacao);
-                    System.out.printf(ANSI_BOLD + ANSI_YELLOW + "Avaliação" + ANSI_RESET + ": " + ANSI_YELLOW +  "%s" + ANSI_RESET + " (%s)\n", estrelas, avaliacao != null ? avaliacao : "Null");
-                    System.out.println();
+        var geradora = new GeradoraDeFigurinha();
+        listaDeConteudos.stream()
+                .limit(10)
+                .forEach(conteudo -> {
+                    try {
+                        String titulo = conteudo.getTitulo();
+                        String urlImagem = conteudo.getUrlImagem();
+                        String avaliacao = conteudo.getAvaliacao();
+
+                        System.out.printf(ANSI_BOLD + ANSI_YELLOW + "Título" + ANSI_RESET + ": " + ANSI_BLACK + ANSI_BRIGHT_BG_CYAN + " %s " + ANSI_RESET + "%n", titulo);
+                        if (avaliacao != null && !avaliacao.isBlank()) {
+                            String estrelas = converteEmEstrelas(avaliacao);
+                            System.out.printf(ANSI_BOLD + ANSI_YELLOW + "Avaliação" + ANSI_RESET + ": " + ANSI_YELLOW + "%s" + ANSI_RESET + " (%s)\n", estrelas, avaliacao != null ? avaliacao : "Null");
+                        }
+                        System.out.println();
+
+                        if (urlImagem != null && !urlImagem.isBlank()) {
+                            InputStream input = new URL(urlImagem).openStream();
+                            geradora.cria(input, titulo);
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 });
 
         // Desafios
@@ -63,11 +66,11 @@ public class App {
     }
 
     private static String converteEmEstrelas(String imDbRating) {
-        if (stringVazia(imDbRating)) {
+        if (Util.stringVazia(imDbRating)) {
             return "NA";
         }
         double avaliacao = Double.parseDouble(imDbRating);
-        int numeroDeEstrelas = (int) Math.round(avaliacao/2);
+        int numeroDeEstrelas = (int) Math.round(avaliacao / 2);
         return "\u2B50".repeat(numeroDeEstrelas);
     }
 
@@ -93,36 +96,12 @@ public class App {
 
             return url + chave;
         } catch (IOError | IOException e) {
-            e.printStackTrace();
-            return "";
+            throw new RuntimeException(e);
         }
     }
 
     private static boolean stringVazia(String s) {
-        if (s == null) {
-            return true;
-        }
-        return "".equals(s.trim());
+        return s == null || s.isBlank();
     }
 
-    private static class Resposta {
-        private List<HashMap<String, String>> items;
-        private String errorMessage;
-
-        public List<HashMap<String, String>> getItems() {
-            return items;
-        }
-
-        public void setItems(List<HashMap<String, String>> items) {
-            this.items = items;
-        }
-
-        public String getErrorMessage() {
-            return errorMessage;
-        }
-
-        public void setErrorMessage(String errorMessage) {
-            this.errorMessage = errorMessage;
-        }
-    }
 }
