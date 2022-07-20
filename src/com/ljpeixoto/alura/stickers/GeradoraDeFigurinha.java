@@ -1,3 +1,5 @@
+package com.ljpeixoto.alura.stickers;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -22,7 +24,7 @@ public class GeradoraDeFigurinha {
         int largura = imagemOriginal.getWidth();
         int altura = imagemOriginal.getHeight();
         int novaAltura = altura + 200;
-        BufferedImage novaImagem = new BufferedImage(largura, novaAltura, BufferedImage.TRANSLUCENT);
+        BufferedImage novaImagem = new BufferedImage(largura, novaAltura, Transparency.TRANSLUCENT);
 
         // copiar a imagem original pra nova imagem (em memória)
         Graphics graphics = novaImagem.createGraphics();

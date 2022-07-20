@@ -1,3 +1,5 @@
+package com.ljpeixoto.alura.stickers.util;
+
 public class Util {
 
     private Util() {

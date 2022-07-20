@@ -1,8 +1,11 @@
+package com.ljpeixoto.alura.stickers.extrator;
+
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ljpeixoto.alura.stickers.model.Conteudo;
 
 import java.util.List;
 

@@ -1,3 +1,11 @@
+package com.ljpeixoto.alura.stickers;
+
+import com.ljpeixoto.alura.stickers.extrator.Extrator;
+import com.ljpeixoto.alura.stickers.extrator.ExtratorNasa;
+import com.ljpeixoto.alura.stickers.model.Conteudo;
+import com.ljpeixoto.alura.stickers.util.ClienteHttp;
+import com.ljpeixoto.alura.stickers.util.Util;
+
 import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +27,7 @@ public class App {
 
         // Lista de filmes Imdb
 //        String url = leUrlDeProperties();
-//        Extrator extrator = new ExtratorImdb();
+//        com.ljpeixoto.alura.stickers.extrator.Extrator extrator = new com.ljpeixoto.alura.stickers.extrator.ExtratorImdb();
 
         // Lista de imagens da Nasa
         String url = "https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&count=5";

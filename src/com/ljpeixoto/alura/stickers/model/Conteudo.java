@@ -1,3 +1,5 @@
+package com.ljpeixoto.alura.stickers.model;
+
 import com.fasterxml.jackson.annotation.JsonAlias;
 
 public class Conteudo {
