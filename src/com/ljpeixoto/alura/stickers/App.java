@@ -1,17 +1,14 @@
 package com.ljpeixoto.alura.stickers;
 
-import com.ljpeixoto.alura.stickers.extrator.Extrator;
-import com.ljpeixoto.alura.stickers.extrator.ExtratorNasa;
+import com.ljpeixoto.alura.stickers.imdb.FontesImagens;
+import com.ljpeixoto.alura.stickers.interfaces.FonteImagens;
 import com.ljpeixoto.alura.stickers.model.Conteudo;
-import com.ljpeixoto.alura.stickers.util.ClienteHttp;
 import com.ljpeixoto.alura.stickers.util.Util;
+import com.ljpeixoto.alura.stickers.util.exception.StickerException;
 
-import java.io.IOError;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
-import java.util.Properties;
 
 public class App {
 
@@ -23,19 +20,9 @@ public class App {
 
     public static void main(String[] args) throws Exception {
 
-        ClienteHttp clienteHttp = new ClienteHttp();
+        FonteImagens fonteImagens = FontesImagens.IMDB_MOST_POPULAR.getFonteImagens();
 
-        // Lista de filmes Imdb
-//        String url = leUrlDeProperties();
-//        com.ljpeixoto.alura.stickers.extrator.Extrator extrator = new com.ljpeixoto.alura.stickers.extrator.ExtratorImdb();
-
-        // Lista de imagens da Nasa
-        String url = "https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&count=5";
-        Extrator extrator = new ExtratorNasa();
-
-        String json = clienteHttp.buscaDados(url);
-
-        List<Conteudo> listaDeConteudos = extrator.extrai(json);
+        List<Conteudo> listaDeConteudos = fonteImagens.buscaListaConteudo();
         System.out.printf("Número de Itens encontrados: %s%n", listaDeConteudos.size());
 
         // exibir e manipular os dados
@@ -51,7 +38,7 @@ public class App {
                         System.out.printf(ANSI_BOLD + ANSI_YELLOW + "Título" + ANSI_RESET + ": " + ANSI_BLACK + ANSI_BRIGHT_BG_CYAN + " %s " + ANSI_RESET + "%n", titulo);
                         if (avaliacao != null && !avaliacao.isBlank()) {
                             String estrelas = converteEmEstrelas(avaliacao);
-                            System.out.printf(ANSI_BOLD + ANSI_YELLOW + "Avaliação" + ANSI_RESET + ": " + ANSI_YELLOW + "%s" + ANSI_RESET + " (%s)\n", estrelas, avaliacao != null ? avaliacao : "Null");
+                            System.out.printf(ANSI_BOLD + ANSI_YELLOW + "Avaliação" + ANSI_RESET + ": " + ANSI_YELLOW + "%s" + ANSI_RESET + " (%s)\n", estrelas, avaliacao);
                         }
                         System.out.println();
 
@@ -60,7 +47,7 @@ public class App {
                             geradora.cria(input, titulo);
                         }
                     } catch (Exception e) {
-                        throw new RuntimeException(e);
+                        throw new StickerException(e);
                     }
                 });
 
@@ -93,36 +80,6 @@ public class App {
         double avaliacao = Double.parseDouble(imDbRating);
         int numeroDeEstrelas = (int) Math.round(avaliacao / 2);
         return "\u2B50".repeat(numeroDeEstrelas);
-    }
-
-    private static String leUrlDeProperties() {
-        try (InputStream input = App.class.getResourceAsStream("resources/config.properties")) {
-            if (input == null) {
-                throw new RuntimeException("Arquivo de config.properties não encontrado.");
-            }
-
-            Properties prop = new Properties();
-            prop.load(input);
-
-            String url = prop.getProperty("IMDB_URL");
-            String chave = prop.getProperty("IMDB_CHAVE_API");
-
-            if (stringVazia(url) || stringVazia(chave)) {
-                throw new RuntimeException("Url e/ou chave do IMDB não configurados corretamente em config.properties.");
-            }
-
-            if (url.contains("mock")) {
-                System.out.println("AVISO: usando URL mockada.");
-            }
-
-            return url + chave;
-        } catch (IOError | IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static boolean stringVazia(String s) {
-        return s == null || s.isBlank();
     }
 
 }

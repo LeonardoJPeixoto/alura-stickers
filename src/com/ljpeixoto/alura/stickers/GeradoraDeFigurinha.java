@@ -4,11 +4,12 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 public class GeradoraDeFigurinha {
 
-    public void cria(InputStream inputStream, String titulo) throws Exception {
+    public void cria(InputStream inputStream, String titulo) throws IOException {
 
         if (inputStream == null || titulo == null) {
             return;

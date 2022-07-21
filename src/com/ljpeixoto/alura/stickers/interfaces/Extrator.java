@@ -1,4 +1,4 @@
-package com.ljpeixoto.alura.stickers.extrator;
+package com.ljpeixoto.alura.stickers.interfaces;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ljpeixoto.alura.stickers.model.Conteudo;

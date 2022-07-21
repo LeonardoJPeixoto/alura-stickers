@@ -1,6 +1,7 @@
 package com.ljpeixoto.alura.stickers.util;
 
-import java.io.IOException;
+import com.ljpeixoto.alura.stickers.util.exception.StickerException;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -18,8 +19,11 @@ public class ClienteHttp {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
             return response.body();
 
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
+        } catch (Exception e) {
+            throw new StickerException(e);
         }
 
     }
